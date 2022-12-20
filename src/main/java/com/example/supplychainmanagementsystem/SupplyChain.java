@@ -20,19 +20,32 @@ public class SupplyChain extends Application {
     public static final int width = 700, height = 600, headerbar = 50;
 
     Pane bodyPane = new Pane();
+    public static int bodywidth, bodyheight;
     Login login = new Login();
-
     productdetails productdetails = new productdetails();
 
+    Button globallogin;
     private GridPane headerbar(){
         TextField searchText = new TextField();
         Button searchbutton = new Button("search");
+        searchbutton.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent actionEvent) {
+                String productName = searchText.getText();
+                //clear body and put this new pain which we are returning in this method from the body
+                bodyPane.getChildren().clear();
+                bodyPane.getChildren().add(
+                        productdetails.getProductsByName(productName));
+            }
+        });
+
+        globallogin = new Button("log In");
 
         GridPane gridPane = new GridPane();
         gridPane.setPrefSize(bodyPane.getMinWidth(), headerbar-10);
         gridPane.setHgap(10);
         gridPane.setVgap(10);
-        gridPane.setStyle("-fx-background-color:#C0C0C0");
+//        gridPane.setStyle("-fx-background-color:#C0C0C0");
 
         gridPane.setAlignment(Pos.CENTER);
 
