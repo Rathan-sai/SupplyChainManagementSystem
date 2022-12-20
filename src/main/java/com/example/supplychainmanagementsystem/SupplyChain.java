@@ -20,6 +20,7 @@ public class SupplyChain extends Application {
     public static final int width = 700, height = 600, headerbar = 50;
 
     Pane bodyPane = new Pane();
+    Login login = new Login();
 
     private GridPane headerbar(){
         TextField searchText = new TextField();
@@ -53,7 +54,13 @@ public class SupplyChain extends Application {
             public void handle(ActionEvent actionEvent) {
                 String mail = emailText.getText();
                 String password = passwordText.getText();
-                labelmessage.setText(mail+ " $& " +password);
+//                labelmessage.setText(mail+ " $& " +password);
+                if(login.customerLogin(mail, password)){
+                    labelmessage.setText("Login successful");
+                }
+                else{
+                    labelmessage.setText("Login Failed");
+                }
             }
         });
 
@@ -97,7 +104,7 @@ public class SupplyChain extends Application {
         stage.show();
     }
 
-//    public static void main(String[] args) {
-//        launch();
-//    }
+    public static void main(String[] args) {
+        launch();
+    }
 }
