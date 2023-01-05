@@ -5,8 +5,11 @@ import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.sql.ResultSet;
 
+//login class which is used the access of logins and their respective password in the sql and determined with the both are match are not.
 public class Login {
 
+    //Here we used a messagedigest class which is used to secure our password as we see here we use a algorithm SHA-256 which is used to
+    //conversion of our password and make secure.
     private static byte[] getSHA(String input){
         try{
             MessageDigest messageDigest = MessageDigest.getInstance("SHA-256");
@@ -17,6 +20,7 @@ public class Login {
         return null;
     }
 
+    //Here in getEncryptedpassword is used to conversion of our password from int to hexadecimal to security of the password.
     private String getEncryptedPassword(String password){
         String encryptedPassword = "";
         try{
@@ -29,10 +33,11 @@ public class Login {
         }
         return null;
     }
+
+    //In customerlogin function use wrote the sql statement to get the login email and password and checking whether they are present are not.
     public boolean customerLogin(String email, String password) {
         String query = String.format("SELECT * FROM customer WHERE email = '%s' AND password = '%s'", email, password);
         try{
-
             DataBaseConnection dbCon = new DataBaseConnection();
             ResultSet rs = dbCon.getQueryTable(query);
             if(rs != null && rs.next())
