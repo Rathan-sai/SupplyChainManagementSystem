@@ -5,6 +5,7 @@ import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -12,19 +13,23 @@ import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
 
-import java.io.FileInputStream;
-import java.io.IOException;
+import java.io.*;
+import java.sql.Blob;
+import java.util.Collection;
 import java.util.Objects;
 
 public class SupplyChain extends Application {
 
 //using a final lengths for the pane to fit for the stage/window width, height, header.
     public static final int width = 700, height = 500, headerbar = 50;
+
+    static boolean selectimage = false;
 
 //using a bodypane for the loginpage, products display and details filling.
     Pane bodyPane = new Pane();
@@ -85,7 +90,14 @@ public class SupplyChain extends Application {
                 String productName = searchText.getText();
                 //clear body and put this new pain which we are returning in this method from the body
                 bodyPane.getChildren().clear();
-                bodyPane.getChildren().add(productdetails.getProductsByName(productName));
+                bodyPane.getChildren().addAll(productdetails.getProductsByName(productName), productsShow());
+                productdetails.productTable.setOnMouseClicked(new EventHandler<MouseEvent>() {
+                    @Override
+                    public void handle(MouseEvent mouseEvent) {
+                        product.id = productdetails.productTable.getSelectionModel().getSelectedIndex()+1;
+                        bodyPane.getChildren().add(productsShow());
+                    }
+                });
                 footerbodyPane.getChildren().clear();
                 footerbodyPane.getChildren().add(footerBar());
             }
@@ -118,6 +130,47 @@ public class SupplyChain extends Application {
         gridPane.add(globalsignoutButton, 5, 0);
         gridPane.add(customeremailLabel, 6, 0);
 
+        return gridPane;
+    }
+
+    public GridPane productsShow(){
+        GridPane gridPane = new GridPane();
+        gridPane.setMinSize(width-400, height);
+        Image image;
+        gridPane.getChildren().clear();
+        if(selectimage) {
+//        Image image = new Image("C:\\Users\\RATHAN SAI\\IdeaProjects\\SupplyChainManagementSystem\\src\\main\\asus tuf.jpg");
+            image = new Image(product.getImage());
+//            System.out.println(product.getImage());
+//        Image image = new Image("C:\\Users\\RATHAN SAI\\IdeaProjects\\SupplyChainManagementSystem\\src\\main\\java\\com\\example\\supplychainmanagementsystem\\asus tuf.jpg");
+
+        }else{
+            image = new Image("C:\\Users\\RATHAN SAI\\IdeaProjects\\SupplyChainManagementSystem\\src\\main\\resources\\explore.jpg");
+//            image = new Image(product.getImage());
+            selectimage = true;
+        }
+        ImageView imageView = new ImageView();
+        imageView.setImage(image);
+        imageView.setFitHeight(bodyPane.getMinHeight());
+        imageView.setFitWidth(300);
+        gridPane.getChildren().add(imageView);
+//        System.out.println(selectimage);
+//        System.out.println(product.id);
+        gridPane.setTranslateX(400);
+        return gridPane;
+    }
+    public GridPane productSelect(){
+        GridPane gridPane = new GridPane();
+        gridPane.setMinSize(width-100, height);
+
+
+        gridPane.setTranslateX(400);
+        Image headImage = new Image("https://www.shutterstock.com/image-vector/vector-white-shop-online-sign-600w-1734707438.jpg");
+        BackgroundImage headback = new BackgroundImage(headImage, BackgroundRepeat.NO_REPEAT, BackgroundRepeat.NO_REPEAT, BackgroundPosition.DEFAULT,
+                new BackgroundSize(1, 1, true, true, true, true));
+
+        Background headbg = new Background(headback);
+        gridPane.setBackground(headbg);
         return gridPane;
     }
 
@@ -154,7 +207,14 @@ public class SupplyChain extends Application {
                     headerbodyPane.getChildren().clear();
                     headerbodyPane.getChildren().add(headerbar());
                     bodyPane.getChildren().clear();
-                    bodyPane.getChildren().add(productdetails.getAllProducts());
+                    bodyPane.getChildren().addAll(productdetails.getAllProducts(), productSelect());
+                    productdetails.productTable.setOnMouseClicked(new EventHandler<MouseEvent>() {
+                        @Override
+                        public void handle(MouseEvent mouseEvent) {
+                            product.id = productdetails.productTable.getSelectionModel().getSelectedIndex()+1;
+                            bodyPane.getChildren().add(productsShow());
+                        }
+                    });
                     footerbodyPane.getChildren().clear();
                     footerbodyPane.getChildren().add(footerBar());
                 }
@@ -274,6 +334,18 @@ public class SupplyChain extends Application {
                         labelmessage.setText("signup failed");
                         labelmessage.setText("please, enter valid credentials");
                     }
+                }else if(in_email.isEmpty()){
+                    labelmessage.setText("please, enter an email.");
+                }else if(in_first_name.isEmpty()){
+                    labelmessage.setText("please, enter an first name.");
+                }else if(in_last_name.isEmpty()){
+                    labelmessage.setText("please, enter an last name.");
+                }else if(in_con_password.isEmpty()){
+                    labelmessage.setText("please, enter an confirm password.");
+                }else if(in_password.isEmpty()){
+                    labelmessage.setText("please, enter an password.");
+                }else if(Float.toString(in_phone_no).length()<10){
+                    labelmessage.setText("please, enter an phone number.");
                 }
             }
         });
@@ -293,7 +365,7 @@ public class SupplyChain extends Application {
         gridPane.setMinSize(bodyPane.getMinWidth(), bodyPane.getMinHeight());
         gridPane.setVgap(10);
         gridPane.setHgap(10);
-        gridPane.setStyle("-fx-background-color:#0000CD");
+//        gridPane.setStyle("-fx-background-color:#0000CD");
 
         gridPane.setAlignment(Pos.CENTER);
 
@@ -477,7 +549,7 @@ public class SupplyChain extends Application {
     }
 
     //createContent pane which consists of all the pane that we are designed.
-    public Pane CreateContent(){
+    public Pane CreateContent() throws FileNotFoundException {
         Pane root = new Pane();
 
         root.setPrefSize(width, height+2*headerbar);
@@ -507,17 +579,26 @@ public class SupplyChain extends Application {
 //        footerbodyPane.getChildren().add(footerBar());
         footerbodyPane.setBackground(headbg);
 
-//        bodyPane.getChildren().addAll(productdetails.getAllProducts());
+//        bodyPane.getChildren().addAll(productdetails.getAllProducts(), productsShow());
 //        bodyPane.getChildren().addAll(signUP());
 //        bodyPane.prefWidthProperty().bind(stack);
         bodyPane.getChildren().add(logincredintials());
 //        bodyPane.getChildren().add(customerAddress());
+//        bodyPane.getChildren().add(productsShow());
 //        bodyPane.getChildren().add(finalPrint());
+//        product.getImage();
         root.getChildren().addAll(bodyPane, footerbodyPane);
         root.getChildren().add(headerbodyPane);
 //        root.getChildren().add(headerbar());
 //        root.getChildren().addAll(footerBar())
-
+//        productdetails.productTable.setOnMouseClicked(new EventHandler<MouseEvent>() {
+//            @Override
+//            public void handle(MouseEvent mouseEvent) {
+//                product.id = productdetails.productTable.getSelectionModel().getSelectedIndex()+1;
+//                bodyPane.getChildren().addAll(productdetails.getAllProducts(), productsShow());
+//                bodyPane.getChildren().clear();
+//            }
+//        });
         return root;
     }
 
