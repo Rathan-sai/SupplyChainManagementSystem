@@ -207,7 +207,7 @@ public class SupplyChain extends Application {
                     headerbodyPane.getChildren().clear();
                     headerbodyPane.getChildren().add(headerbar());
                     bodyPane.getChildren().clear();
-                    bodyPane.getChildren().addAll(productdetails.getAllProducts(), productSelect());
+                    bodyPane.getChildren().addAll(productdetails.getAllProducts(), productsShow());
                     productdetails.productTable.setOnMouseClicked(new EventHandler<MouseEvent>() {
                         @Override
                         public void handle(MouseEvent mouseEvent) {
